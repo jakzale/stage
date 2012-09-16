@@ -37,26 +37,38 @@ func TestEntityCreation(t *testing.T) {
 	var n *Entity = nil
 
 	// Testing entitiy constructor
-	test(t, "Entity1", e1.Script(), "")
-	test(t, "Entity2", e2.Script(), script)
+	test(t, "Basic Entity Script", e1.Script(), "")
+	test(t, "Basic Action", e2.Script(), script)
 
 	// Testing if Action works fine
-	test(t, "Action1", e1.IsAction(), false)
-	test(t, "Action2", e2.IsAction(), true)
+	test(t, "Entity is not Action", e1.IsAction(), false)
+	test(t, "Action is Action", e2.IsAction(), true)
 
 	// Testing the basic connections
-	test(t, "Linkin1", n, e1.Find("something"))
+	test(t, "Player found something", n, e1.Find("something", true))
+	test(t, "Imp found something", n, e1.Find("something", false))
 
 	name := "name"
-	e1.Link(name, e2)
-	test(t, "Linkin2", e1.Find(name), e2)
-	test(t, "Linkin3", e1.Hidden(name), false)
+
+	e1.Link(name, e2, true)
+
+	//
+	test(t, "Player found a link", e1.Find(name, true), e2)
+	test(t, "Link is hidden", e1.Hidden(name), false)
 
 	e1.Hide(name)
-	test(t, "Linkin4", e1.Hidden(name), true)
+	test(t, "Link is now hidden 1", e1.Hidden(name), true)
+	test(t, "Player cannot find it", e1.Find(name, true), n)
+	test(t, "Imp can find it", e1.Find(name, false), e2)
 
 	e1.Reveal(name)
-	test(t, "Linkin5", e1.Hidden(name), false)
+	test(t, "Link is now visible", e1.Hidden(name), false)
+
+	// Readding test
+	e1.Link(name, e2, false)
+	test(t, "Link is now hidden", e1.Hidden(name), true)
+	test(t, "Player cannot find it", e1.Find(name, true), n)
+	test(t, "Imp can find it", e1.Find(name, false), e2)
 
 	links := e1.Links()
 	test(t, "Linkin6", len(links), 1)
@@ -65,10 +77,14 @@ func TestEntityCreation(t *testing.T) {
 	e1.Unlink(name)
 	links = e1.Links()
 
-	test(t, "Linkin8", e1.Find(name), n)
-	test(t, "Linkin8a", e1.Find(name), e1.Find(name))
-	test(t, "Linkin9", len(links), 0)
+	test(t, "Unlinking works for player", e1.Find(name, true), n)
+	test(t, "Unlinking works for imp", e1.Find(name, false), n)
+
+	test(t, "Symmetry for player", e1.Find(name, true), e1.Find(name, true))
+	test(t, "Symmetry for imp", e1.Find(name, false), e1.Find(name, false))
+
+	test(t, "Veryfying the links", len(links), 0)
 	// This one is not exactly correct
-	test(t, "Linkin0", e1.Hidden(name), false)
+	test(t, "Empty link isHidden test", e1.Hidden(name), false)
 
 }

@@ -7,10 +7,10 @@ package stage
  * Need to include the rest
  */
 
+// TODO: Still needs some functionality to preserve the oreder in the hash map
 type Entity struct {
 	script string
 	links  map[string]*Entity
-
 	hidden map[string]bool
 }
 
@@ -34,14 +34,11 @@ func (e *Entity) IsAction() bool {
 	return e.script != ""
 }
 
-func (e *Entity) Link(name string, target *Entity) {
+func (e *Entity) Link(name string, target *Entity, isVisible bool) {
 	// Linking the entity
 	e.links[name] = target
-	// Removing it from the hidden
-	// In case of creating new links
-	delete(e.hidden, name)
-
-	return
+	// There is some inconsistency regarding this
+	e.hidden[name] = !isVisible
 }
 
 func (e *Entity) Unlink(name string) {
@@ -49,11 +46,24 @@ func (e *Entity) Unlink(name string) {
 	delete(e.hidden, name)
 }
 
-func (e *Entity) Find(name string) *Entity {
-	return e.links[name]
+func (e *Entity) Find(name string, isPlayer bool) (result *Entity) {
+	result = nil
+	if isPlayer {
+		if !e.hidden[name] {
+			result = e.links[name]
+		}
+	} else {
+		if name == "this" || name == "here" {
+			result = e
+		} else {
+			result = e.links[name]
+		}
+	}
+	return
 }
 
 // Returning the copy of the links
+// This one needs to preserve the order somehow...
 func (e *Entity) Links() []string {
 	size := len(e.links)
 	links := make([]string, size)
@@ -72,7 +82,8 @@ func (e *Entity) Hidden(name string) bool {
 }
 
 func (e *Entity) Reveal(name string) {
-	delete(e.hidden, name)
+	//delete(e.hidden, name)
+	e.hidden[name] = false
 }
 
 func (e *Entity) Hide(name string) {
