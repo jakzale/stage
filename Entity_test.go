@@ -12,9 +12,13 @@ import (
 )
 
 var (
-	e1     = NewEntity()
-	script = "Some script"
-	e2     = NewEntityWithScript(script)
+	e1             = NewEntity()
+	script         = "Some script"
+	e2             = NewEntityWithScript(script)
+	here           = "here"
+	this           = "this"
+	name           = "name"
+	n      *Entity = nil
 )
 
 // Basic testing function!!
@@ -33,9 +37,6 @@ func test(t *testing.T, name string, a, b interface{}) {
 // Expected x, resulted y
 func TestEntityCreation(t *testing.T) {
 
-	// Empty entity
-	var n *Entity = nil
-
 	// Testing entitiy constructor
 	test(t, "Basic Entity Script", e1.Script(), "")
 	test(t, "Basic Action", e2.Script(), script)
@@ -47,8 +48,6 @@ func TestEntityCreation(t *testing.T) {
 	// Testing the basic connections
 	test(t, "Player found something", n, e1.Find("something", true))
 	test(t, "Imp found something", n, e1.Find("something", false))
-
-	name := "name"
 
 	e1.Link(name, e2, true)
 
@@ -87,4 +86,10 @@ func TestEntityCreation(t *testing.T) {
 	// This one is not exactly correct
 	test(t, "Empty link isHidden test", e1.Hidden(name), false)
 
+	// TODO: Add tests for here and this
+	test(t, "Here is not available to player", e1.Find(here, true), n)
+	test(t, "This is not available to player", e1.Find(this, true), n)
+
+	test(t, "Here is available to imp", e1.Find(here, false), e1)
+	test(t, "This is available to imp", e1.Find(this, false), e1)
 }
