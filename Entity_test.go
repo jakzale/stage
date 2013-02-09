@@ -1,12 +1,11 @@
 package stage
 
 /**
- *
- * This is a set of Entity tests
- *
+ * Testing for the Entity class
  */
 
 import (
+	"fmt"
 	"testing"
 	//"reflect"
 )
@@ -21,8 +20,10 @@ var (
 	n      *Entity = nil
 )
 
-// Basic testing function!!
-// Okay, this ones will never be nil
+func format(a, b interface{}) string {
+	return fmt.Sprintf("got %s want %s", a, b)
+}
+
 func test(t *testing.T, name string, a, b interface{}) {
 	// Turns out Google go has difficulties with comparing nils, becuase there
 	// are no nil interfaces -_-
@@ -33,21 +34,52 @@ func test(t *testing.T, name string, a, b interface{}) {
 	}
 }
 
-// Need to make test with the following values
-// Expected x, resulted y
+// Splitting the test cases into seperate ones
+func TestEntityCreation_001(t *testing.T) {
+	a, b := e1.script, ""
+	if a != b {
+		t.Errorf(format(a, b))
+	}
+}
+
+func TestEntityCreation_002(t *testing.T) {
+	a, b := e2.script, script
+	if a != b {
+		t.Errorf(format(a, b))
+	}
+}
+
+func TestEntityCreation_003(t *testing.T) {
+	a, b := e1.IsAction(), false
+	if a != b {
+		t.Errorf(format(a, b))
+	}
+}
+
+func TestEntityCreation_004(t *testing.T) {
+	a, b := e2.IsAction(), true
+	if a != b {
+		t.Errorf(format(a, b))
+	}
+}
+
+func TestEntityCreation_005(t *testing.T) {
+	a, b := e1.Find("something", true), n
+	if a != b {
+		t.Errorf(format(a, b))
+	}
+}
+
+func TestEntityCreation_006(t *testing.T) {
+	a, b := e1.Find("something", false), n
+	if a != b {
+		t.Errorf(format(a, b))
+	}
+}
+
+// The following test need some kind of test preparation
+// Leave it for now
 func TestEntityCreation(t *testing.T) {
-
-	// Testing entitiy constructor
-	test(t, "Basic Entity Script", e1.Script(), "")
-	test(t, "Basic Action", e2.Script(), script)
-
-	// Testing if Action works fine
-	test(t, "Entity is not Action", e1.IsAction(), false)
-	test(t, "Action is Action", e2.IsAction(), true)
-
-	// Testing the basic connections
-	test(t, "Player found something", n, e1.Find("something", true))
-	test(t, "Imp found something", n, e1.Find("something", false))
 
 	e1.Link(name, e2, true)
 
